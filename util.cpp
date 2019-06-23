@@ -49,8 +49,8 @@ namespace VISIONNOOB
 				{
 					for (int i = 0; i < src.cols; i++)
 					{
-						int x = T.at<double>(0, 0) * i + T.at<double>(0, 1) * j + T.at<double>(0, 2);
-						int y = T.at<double>(1, 0) * i + T.at<double>(1, 1) * j + T.at<double>(1, 2);
+						int x = T.at<double>(0, 0) * (double)i + T.at<double>(0, 1) * (double)j + T.at<double>(0, 2);
+						int y = T.at<double>(1, 0) * (double)i + T.at<double>(1, 1) * (double)j + T.at<double>(1, 2);
 
 						dst.at<cv::Vec3b>(y, x)[0] = src.at<cv::Vec3b>(j, i)[0];
 						dst.at<cv::Vec3b>(y, x)[1] = src.at<cv::Vec3b>(j, i)[1];

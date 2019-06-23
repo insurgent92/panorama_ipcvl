@@ -85,9 +85,7 @@ int main()
 		scene.push_back(keypoints2[goodMatches[i].trainIdx].pt);
 	}
 
-	Mat H = findHomography(scene, obj,CV_RANSAC);
-
-	
+	Mat H = findHomography(scene, obj, CV_RANSAC);
 
 	cv::Mat result;
 	cv::warpPerspective(src2,            // input image
@@ -120,7 +118,6 @@ int main()
 	}
 
 	
-
 	imshow("result", result);
 	imshow("src1", src1);
 	imshow("src2", src2);
