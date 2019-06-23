@@ -38,7 +38,7 @@ int main()
 
 	//Step 3: Matching descriptor vectors
 	vector<DMatch> matches;
-	BFMatcher matcher(NORM_HAMMING);
+	BFMatcher matcher(NORM_L2);
 	matcher.match(descriptor1, descriptor2, matches);
 
 	cout << "matches.size()=<<" << matches.size() << endl;
@@ -76,24 +76,18 @@ int main()
 	imshow("Good Matches", imgMathes);
 
 	// find Homography between keypoint1 and keypoint2
-	vector<Point2f> obj;
-	vector<Point2f> scene;
+	vector<Point2f> left;
+	vector<Point2f> right;
 	for (int i = 0; i < goodMatches.size(); i++)
 	{
 		//Get the keypoints from the good matches
-		obj.push_back(keypoints1[goodMatches[i].queryIdx].pt);
-		scene.push_back(keypoints2[goodMatches[i].trainIdx].pt);
+		left.push_back(keypoints1[goodMatches[i].queryIdx].pt);
+		right.push_back(keypoints2[goodMatches[i].trainIdx].pt);
 	}
 
-	Mat H = findHomography(scene, obj, CV_RANSAC);
+	//Mat H = findHomography(right, left, CV_RANSAC);
+	Mat H = VISIONNOOB::PANORAMA::UTIL::findHomographyWithRANSAC(left, right);
 
-	cv::Mat result;
-	cv::warpPerspective(src2,            // input image
-		result,                 // output image
-		H,                  // homography
-		cv::Size(2 * src2.cols, src2.rows));
-
-	//H.convertTo(H, CV_32SC1);
 	cv::Mat dst;
 	VISIONNOOB::PANORAMA::UTIL::stitch(src1, src2, dst, H);
 
@@ -118,7 +112,6 @@ int main()
 	}
 
 	
-	imshow("result", result);
 	imshow("src1", src1);
 	imshow("src2", src2);
 	imshow("imgMatches", imgMathes);
