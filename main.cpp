@@ -1,42 +1,7 @@
 #include <iostream>
 #include "use_opencv.h"
 #include "config.hpp"
-
-
-void pointWiseAffineTransform(const cv::Mat &src, cv::Mat& dst, const cv::Mat T)
-{
-	for (int j = 0; j < src.rows; j++)
-	{
-		for (int i = 0; i < src.cols; i++)
-		{
-			int x =T.at<int>(0, 0) * i + T.at<int>(0, 1) * j + T.at<int>(0, 2);
-			int y =T.at<int>(1, 0) * i + T.at<int>(1, 1) * j + T.at<int>(1, 2);
-
-			dst.at<cv::Vec3b>(y, x)[0] = src.at<cv::Vec3b>(j, i)[0];
-			dst.at<cv::Vec3b>(y, x)[1] = src.at<cv::Vec3b>(j, i)[1];
-			dst.at<cv::Vec3b>(y, x)[2] = src.at<cv::Vec3b>(j, i)[2];
-		}
-	}
-}
-void stitch(const cv::Mat& leftImage, const cv::Mat& rightImage, cv::OutputArray dst, const cv::Mat& rightT, int extraVerticalMargin = 30, int extraHorizontalMargin = 30)
-{
-	dst.create(cv::Size(leftImage.cols * 2 + extraHorizontalMargin * 2, leftImage.rows + extraVerticalMargin * 2), CV_8UC3);
-	cv::Mat dstImage = dst.getMat();
-	dstImage.setTo(cv::Scalar(0, 0, 0));
-	cv::Mat _rightT = rightT.clone();
-	
-
-	int leftTElements[3][3] = { {1, 0, extraHorizontalMargin },{ 0, 1, extraVerticalMargin } ,{ 0, 0, 1 } };
-	cv::Mat _leftT = cv::Mat(3, 3, CV_32S, &leftTElements);
-
-	_rightT.at<int>(0, 2) += extraHorizontalMargin;
-	_rightT.at<int>(1, 2) += extraVerticalMargin;
-
-	pointWiseAffineTransform(leftImage, dstImage, _leftT);
-	pointWiseAffineTransform(rightImage, dstImage, _rightT);
-
-	//dst = dstImage.getM;
-}
+#include "util.hpp"
 
 int main()
 {
@@ -122,6 +87,18 @@ int main()
 
 	Mat H = findHomography(scene, obj,CV_RANSAC);
 
+	
+
+	cv::Mat result;
+	cv::warpPerspective(src2,            // input image
+		result,                 // output image
+		H,                  // homography
+		cv::Size(2 * src2.cols, src2.rows));
+
+	//H.convertTo(H, CV_32SC1);
+	cv::Mat dst;
+	VISIONNOOB::PANORAMA::UTIL::stitch(src1, src2, dst, H);
+
 	vector<Point2f> objP(4);
 	objP[0] = Point(0, 0);
 	objP[1] = Point(gray_src1.cols, 0);
@@ -142,9 +119,9 @@ int main()
 		line(imgMathes, sceneP[i], sceneP[(i + 1) % 4], Scalar(255, 0, 0), 4);
 	}
 
-	cv::Mat dst;
-	stitch(src1, src2, dst, H);
+	
 
+	imshow("result", result);
 	imshow("src1", src1);
 	imshow("src2", src2);
 	imshow("imgMatches", imgMathes);
