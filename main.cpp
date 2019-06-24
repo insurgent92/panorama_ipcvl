@@ -3,7 +3,7 @@
 #include "config.hpp"
 #include "util.hpp"
 #include "Matcher.h"
-
+#include "HOGDescriptorExtractor.h"
 int main()
 {
 	using namespace std;
@@ -33,9 +33,14 @@ int main()
 
 	//Step 2: Calclate descriptors
 	Mat descriptor1, descriptor2;
+	
 	Ptr<xfeatures2d::BriefDescriptorExtractor> extractor = xfeatures2d::BriefDescriptorExtractor::create();
 	extractor->compute(gray_src1, keypoints1, descriptor1);
 	extractor->compute(gray_src2, keypoints2, descriptor2);
+
+	VISIONNOOB::PANORAMA::HOGDescriptorExtractor extractor2;
+	extractor2.compute(gray_src1, keypoints1, descriptor1);
+	extractor2.compute(gray_src2, keypoints2, descriptor2);
 
 	//Step 3: Matching descriptor vectors
 	vector<DMatch> matches;
@@ -113,7 +118,6 @@ int main()
 		line(imgMathes, sceneP[i], sceneP[(i + 1) % 4], Scalar(255, 0, 0), 4);
 	}
 
-	
 	imshow("src1", src1);
 	imshow("src2", src2);
 	imshow("imgMatches", imgMathes);
