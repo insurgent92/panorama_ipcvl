@@ -160,7 +160,7 @@ namespace VISIONNOOB
 			{
 				int maxIteration = 2000;
 
-				int inlierNumSampleBound = 10;	//same with opencv 
+				int inlierNumSampleBound = 4;	//same with opencv 
 				double fitnessErrorBound_by_element_t = 3.0;	//same with opencv 
 				double fitnessErrorBound_by_total_e = 3.0;	//same with opencv 
 
