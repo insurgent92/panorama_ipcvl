@@ -2,6 +2,7 @@
 #include "use_opencv.h"
 #include "config.hpp"
 #include "util.hpp"
+#include "Matcher.h"
 
 int main()
 {
@@ -23,7 +24,7 @@ int main()
 	//Step 1: detect the keypoints
 	vector<KeyPoint> keypoints1, keypoints2;
 
-	Ptr<FastFeatureDetector> fastF = FastFeatureDetector::create(5, true);
+	Ptr<FastFeatureDetector> fastF = FastFeatureDetector::create(20, true);
 	fastF->detect(gray_src1, keypoints1);
 	fastF->detect(gray_src2, keypoints2);
 
@@ -39,6 +40,7 @@ int main()
 	//Step 3: Matching descriptor vectors
 	vector<DMatch> matches;
 	BFMatcher matcher(NORM_L2);
+	//VISIONNOOB::PANORAMA::Matcher mather2;
 	matcher.match(descriptor1, descriptor2, matches);
 
 	cout << "matches.size()=<<" << matches.size() << endl;
