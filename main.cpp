@@ -3,6 +3,7 @@
 #include "config.hpp"
 #include "util.hpp"
 #include "Matcher.h"
+#include "FeatureExtractor.h"
 
 int main()
 {
@@ -24,13 +25,19 @@ int main()
 	//Step 1: detect the keypoints
 	vector<KeyPoint> keypoints1, keypoints2;
 
-	Ptr<FastFeatureDetector> fastF = FastFeatureDetector::create(20, true);
-	fastF->detect(gray_src1, keypoints1);
-	fastF->detect(gray_src2, keypoints2);
+	//Ptr<FastFeatureDetector> fastF = FastFeatureDetector::create(20, true);
+	//fastF->detect(gray_src1, keypoints1);
+	//fastF->detect(gray_src2, keypoints2);
+
+	VISIONNOOB::PANORAMA::FeatureExtractor MORAVEC;
+	MORAVEC.detect(gray_src1, keypoints1, 3, 1.5E+04);
+	MORAVEC.detect(gray_src2, keypoints2, 3, 1.5E+04);
+	//VISIONNOOB::PANORAMA::UTIL::cornerMORAVEC(gray_src1, keypoints1, 3, 1.5E+04);
+	//VISIONNOOB::PANORAMA::UTIL::cornerMORAVEC(gray_src2, keypoints2, 3, 1.5E+04);
 
 	cout << "keypoints1.size()=" << keypoints1.size() << endl;
 	cout << "keypoints2.size()=" << keypoints2.size() << endl;
-
+//	return 0;
 	//Step 2: Calclate descriptors
 	Mat descriptor1, descriptor2;
 	Ptr<xfeatures2d::BriefDescriptorExtractor> extractor = xfeatures2d::BriefDescriptorExtractor::create();
@@ -65,7 +72,8 @@ int main()
 	double fTh = 2 * minDist;
 	for (int i = 0; i < matches.size(); i++)
 	{
-		if (matches[i].distance <= max(fTh, 0.02))
+		//if (matches[i].distance <= max(fTh, 0.02))
+		if (matches[i].distance <= 60)
 			goodMatches.push_back(matches[i]);
 	}
 	cout << "goodMatches.size()=" << goodMatches.size() << endl;
