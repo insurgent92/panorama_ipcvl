@@ -121,13 +121,13 @@ namespace VISIONNOOB
 					Y.at<double>(4, 0) += (double)(std::get<1>(keypointsPair[i]).y * std::get<0>(keypointsPair[i]).y);	// a_i2 * b_i2
 					Y.at<double>(5, 0) += (double)(std::get<0>(keypointsPair[i]).y);									// b_i2
 				}
-				
+
 
 				cv::Mat M_inv = M.inv();
 				cv::Mat T = M_inv*(Y);
 				cv::Mat test = M * M_inv;
 				cv::Mat retT = cv::Mat(cv::Size(3, 3), CV_64FC1, cv::Scalar(0.));
-				
+
 				retT.at<double>(0, 0) = T.at<double>(0, 0);
 				retT.at<double>(1, 0) = T.at<double>(1, 0);
 				retT.at<double>(2, 0) = T.at<double>(2, 0);
@@ -135,7 +135,7 @@ namespace VISIONNOOB
 				retT.at<double>(1, 1) = T.at<double>(4, 0);
 				retT.at<double>(2, 1) = T.at<double>(5, 0);
 				retT.at<double>(2, 2) = 1;
-				
+
 				return retT;
 			}
 
@@ -144,7 +144,7 @@ namespace VISIONNOOB
 				double retError = 0.0;
 				cv::Point2f leftPoint = std::get<0>(pointsPair);
 				cv::Point2f rightPoint = std::get<1>(pointsPair);
-				
+
 				double t11, t12, t21, t22, t31, t32;	// see 식 (7.14) in page 322 
 
 				t11 = T.at<double>(0, 0);
@@ -155,7 +155,7 @@ namespace VISIONNOOB
 				t32 = T.at<double>(2, 1);
 
 				retError = (leftPoint.x - (rightPoint.x * t11 + rightPoint.y * t21 + t31)) * (leftPoint.x - (rightPoint.x * t11 + rightPoint.y * t21 + t31))
-						 + (leftPoint.y - (rightPoint.x * t12 + rightPoint.y * t22 + t32)) * (leftPoint.y - (rightPoint.x * t12 + rightPoint.y * t22 + t32));
+					+ (leftPoint.y - (rightPoint.x * t12 + rightPoint.y * t22 + t32)) * (leftPoint.y - (rightPoint.x * t12 + rightPoint.y * t22 + t32));
 
 				return retError;
 			}
@@ -230,8 +230,8 @@ namespace VISIONNOOB
 				double lowest_error = std::numeric_limits<float>::max();
 				cv::Mat optimalTransform;
 
-				
-				for (int iter = 0; iter < 2000 ; iter++)
+
+				for (int iter = 0; iter < 2000; iter++)
 				{
 					std::vector<cv::Point2f> leftKeypoints = _leftKeypoints;
 					std::vector<cv::Point2f> rightKeypoints = _rightKeypoints;
@@ -241,7 +241,7 @@ namespace VISIONNOOB
 
 					std::vector<std::tuple<cv::Point2f, cv::Point2f>> threeKeypointsPair;
 					std::vector<std::tuple<cv::Point2f, cv::Point2f>> restKeypointsPair;
-					
+
 
 					srand((unsigned int)time(NULL));
 
