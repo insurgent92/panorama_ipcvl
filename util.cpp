@@ -2,6 +2,10 @@
 #include <float.h>
 #include <cstdlib>
 #include <ctime>
+#include <cmath>
+
+#define PI 3.1415926535
+
 #include "use_opencv.h"
 
 namespace VISIONNOOB
@@ -154,6 +158,65 @@ namespace VISIONNOOB
 						 + (leftPoint.y - (rightPoint.x * t12 + rightPoint.y * t22 + t32)) * (leftPoint.y - (rightPoint.x * t12 + rightPoint.y * t22 + t32));
 
 				return retError;
+			}
+
+			void calcSobel(cv::InputArray _image, std::tuple<cv::Mat, cv::Mat>& dst)
+			{
+
+				cv::Mat dx, dy;
+				cv::Mat src = _image.getMat();
+
+				// Initialize arguments for the filter
+				cv::Point anchor = cv::Point(-1, -1);
+				double delta = 0;
+				cv::Mat kernelGx, kernelGy;
+				int ind = 0;
+				int kernel_size = 3;
+				double kernelElementsGx[3][3] = { { -1, 0, 1 },{ -2, 0, 2 } ,{ -1, 0, 1 } };
+				double kernelElementsGy[3][3] = { { 1, 2, 1 },{ 0, 0, 0 } ,{ -1, -2, -1 } };
+
+				kernelGx = cv::Mat(cv::Size(kernel_size, kernel_size), CV_64F, kernelElementsGx);
+				kernelGy = cv::Mat(cv::Size(kernel_size, kernel_size), CV_64F, kernelElementsGy);
+
+				cv::filter2D(src, dx, CV_64F, kernelGx, anchor, delta, cv::BORDER_DEFAULT);
+				cv::filter2D(src, dy, CV_64F, kernelGy, anchor, delta, cv::BORDER_DEFAULT);
+
+				cv::Mat debug_x;
+				cv::Sobel(src, debug_x, CV_64F, 1, 0, 3);
+
+				dst = std::make_tuple(dx, dy);
+				return;
+			}
+
+			void calcGradientAndMagnitute(std::tuple<cv::Mat, cv::Mat>& sobels, std::tuple<cv::Mat, cv::Mat>& dst)
+			{
+				cv::Mat dx = std::get<0>(sobels);
+				cv::Mat dy = std::get<1>(sobels);
+
+				cv::Mat gradient(dx.size(), CV_64FC1, cv::Scalar(0.));
+				//cv::Mat gradient2(dx.size(), CV_64FC1, cv::Scalar(0.));
+				cv::Mat magnitude(dx.size(), CV_64FC1, cv::Scalar(0.));
+				dx.convertTo(dx, CV_64FC1);
+				dy.convertTo(dy, CV_64FC1);
+
+				magnitude = dx.mul(dx) + dy.mul(dy);
+				double tessss = (double)atan2(10, 255) * 180. / PI;
+				for (int j = 0; j < magnitude.rows; j++)
+				{
+					for (int i = 0; i < magnitude.cols; i++)
+					{
+						magnitude.at<double>(j, i) = cv::sqrt(magnitude.at<double>(j, i));
+						double x = dx.at<double>(j, i);
+						double y = dy.at<double>(j, i);
+						gradient.at<double>(j, i) = (double)cv::fastAtan2(y, x);
+						
+						//double degree = std::atan2(y, x) * 180 / PI;
+					//	degree >= 0.0 ? degree =  degree = degree : degree = degree + 360;
+						//gradient.at<double>(j, i) = degree;
+					}
+				}
+
+				dst = std::make_tuple(gradient, magnitude);
 			}
 
 			cv::Mat findHomographyWithRANSAC(std::vector<cv::Point2f>& _leftKeypoints, std::vector<cv::Point2f>& _rightKeypoints)
