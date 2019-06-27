@@ -1,8 +1,10 @@
 #include <iostream>
+#include <cmath>
 #include "use_opencv.h"
 #include "config.hpp"
 #include "util.hpp"
 #include "Matcher.h"
+#include "HOGDescriptorExtractor.h"
 #include "FeatureExtractor.h"
 
 int main()
@@ -45,10 +47,27 @@ int main()
 	/*Step 2: Calclate descriptors*/
 	////////////////////////////////
 	Mat descriptor1, descriptor2;
+	
+	cv::Size winSize = cv::Size(32, 32);
+	cv::Size blockSize = cv::Size(16, 16);
+	cv::Size blockStride = cv::Size(16, 16);
+	cv::Size cellSize = cv::Size(8, 8);
+	int nBins = 9;
+	int derivAper = 1;
+	int winSigma = -1;
+	int histogramNormType = 0;
+	float L2HysThresh = 0.2;
+	int gammaCorrection = 1;
+	int n_level = 64;
+	bool useSignedGradients = 1;
 
-	Ptr<xfeatures2d::BriefDescriptorExtractor> extractor = xfeatures2d::BriefDescriptorExtractor::create();
-	extractor->compute(gray_src1, keypoints1, descriptor1);
-	extractor->compute(gray_src2, keypoints2, descriptor2);
+	//Ptr<xfeatures2d::BriefDescriptorExtractor> extractor = xfeatures2d::BriefDescriptorExtractor::create();
+	//extractor->compute(gray_src1, keypoints1, descriptor1);
+	//extractor->compute(gray_src2, keypoints2, descriptor2);
+
+	VISIONNOOB::PANORAMA::HOGDescriptorExtractor extractor2(winSize, blockSize, blockStride, cellSize, nBins, L2HysThresh);
+	extractor2.compute(gray_src1, keypoints1, descriptor1);
+	extractor2.compute(gray_src2, keypoints2, descriptor2);
 
 	///////////////////////////////////////
 	/*Step 3: Matching descriptor vectors*/
@@ -57,7 +76,6 @@ int main()
 
 	//BFMatcher matcher(NORM_L2);
 	VISIONNOOB::PANORAMA::Matcher matcher;
-
 	matcher.match(descriptor1, descriptor2, matches);
 
 	cout << "matches.size()=<<" << matches.size() << endl;
@@ -70,26 +88,14 @@ int main()
 	vector<DMatch> goodMatches;
 	double minDist, maxDist;
 
-	minDist = maxDist = matches[0].distance;
-
-	for (int i = 1; i < matches.size(); i++)
-	{
-		double dist = matches[i].distance;
-		if (dist < minDist) minDist = dist;
-		if (dist > maxDist) maxDist = dist;
-	}
-
-	cout << "minDist=" << minDist << endl;
-	cout << "maxDist=" << maxDist << endl;
-
-	double fTh = 2 * minDist;
 	for (int i = 0; i < matches.size(); i++)
 	{
-		//if (matches[i].distance <= max(fTh, 0.02))
-		if (matches[i].distance <= 60)
+		if (matches[i].distance <= 15)
 			goodMatches.push_back(matches[i]);
 	}
+
 	cout << "goodMatches.size()=" << goodMatches.size() << endl;
+
 	if (goodMatches.size() < 4)
 		return 0;
 
@@ -129,6 +135,5 @@ int main()
 	imshow("dst", dst);
 
 	waitKey();
-
 	return 0;
 }
