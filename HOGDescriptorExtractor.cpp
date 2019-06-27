@@ -25,44 +25,58 @@ namespace VISIONNOOB
 		{
 		}
 
-		
+		void HOGDescriptorExtractor::refineKeypoints(std::vector<cv::KeyPoint>& keypoints, int cols, int rows)
+		{
+			auto it = keypoints.begin();
+
+			while (it != keypoints.end()) {
+
+				int roi_x = (*it).pt.x - winSize.width / 2;
+				int roi_y = (*it).pt.y - winSize.height / 2;
+				int roi_width = winSize.width;
+				int roi_height = winSize.height;
+
+				if ((roi_x < 0) || (roi_y < 0) || (roi_x + roi_width >= cols) || (roi_y + roi_height >= rows))
+				{
+					it = keypoints.erase(it);
+					std::cout << "skip this keypoint" << std::endl;
+				}
+				else ++it;
+			}
+		}
+
 		//see http://blog.naver.com/PostView.nhn?blogId=tommybee&logNo=221173056260&parentCategoryNo=&categoryNo=57&viewDate=&isShowPopularPosts=true&from=search
 		void HOGDescriptorExtractor::compute(cv::InputArray image, std::vector<cv::KeyPoint>& keypoints, cv::OutputArray _descriptors)
 		{
-			
 			cv::Mat inputImage = image.getMat();
 			std::tuple<cv::Mat, cv::Mat> derivatives;
-			std::tuple<cv::Mat, cv::Mat> magnitudeAndDegree;
+			std::tuple<cv::Mat, cv::Mat> degreeAndMagnitude;
 			VISIONNOOB::PANORAMA::UTIL::calcSobel(image, derivatives);
-			VISIONNOOB::PANORAMA::UTIL::calcGradientAndMagnitute(derivatives, magnitudeAndDegree);
+			VISIONNOOB::PANORAMA::UTIL::calcGradientAndMagnitute(derivatives, degreeAndMagnitude);
 
-			cv::Mat degree = std::get<0>(magnitudeAndDegree);
-			cv::Mat manitude = std::get<1>(magnitudeAndDegree);
+			cv::Mat degree = std::get<0>(degreeAndMagnitude);
+			cv::Mat manitude = std::get<1>(degreeAndMagnitude);
 
 			int blockTotalIter = (winSize.width - blockSize.width) / blockStride.width + 1;
 			int numCellsPerBlock = blockSize.width / cellSize.width;
 			int dimVector = nBins * blockTotalIter * blockTotalIter * numCellsPerBlock * numCellsPerBlock;
 
+			refineKeypoints(keypoints, inputImage.cols, inputImage.rows);
+
 			cv::Mat descriptors(cv::Size(dimVector, keypoints.size()), CV_64FC1, cv::Scalar(0));
 
-			for (int keyPointIter = 0 ; keyPointIter < keypoints.size() ; keyPointIter ++)
+
+			for (int keyPointIter = 0; keyPointIter < keypoints.size(); keyPointIter++)
 			{
 				int roi_x = keypoints[keyPointIter].pt.x - winSize.width / 2;
 				int roi_y = keypoints[keyPointIter].pt.y - winSize.height / 2;
 				int roi_width = winSize.width;
 				int roi_height = winSize.height;
 
-				if ((roi_x < 0) || (roi_y < 0) || (roi_x + roi_width >= inputImage.cols) || (roi_y + roi_height >= inputImage.rows))
-				{
-					std::cout << "skip this keypoint" << std::endl;
-					continue;
-				}
-
 				cv::Mat currentROI = inputImage(cv::Rect(roi_x, roi_y, roi_width, roi_height));
 				cv::Mat currentROI_Mag = manitude(cv::Rect(roi_x, roi_y, roi_width, roi_height));
 				cv::Mat currentROI_Deg = degree(cv::Rect(roi_x, roi_y, roi_width, roi_height));
 
-				
 				for (int blockIter_y = 0; blockIter_y < blockTotalIter; blockIter_y++)
 				{
 					for (int blockIter_x = 0; blockIter_x < blockTotalIter; blockIter_x++)
@@ -172,20 +186,20 @@ namespace VISIONNOOB
 							}
 						}
 
-						int block_idx = blockTotalIter * blockIter_y  + blockIter_x ;
-		
+						int block_idx = blockTotalIter * blockIter_y + blockIter_x;
+
 						for (int hist_i = 0; hist_i < block_hists.size(); hist_i++)
 						{
 							cv::Mat featureVector(cv::Size(nBins, 1), CV_64FC1);
 							memcpy(featureVector.data, block_hists[hist_i].data(), block_hists[hist_i].size() * sizeof(double));
 
-							cv::Mat roi = descriptors(cv::Rect(block_idx * blockTotalIter * blockTotalIter * numCellsPerBlock * numCellsPerBlock + nBins * hist_i, keyPointIter, nBins, 1));
+							cv::Mat roi = descriptors(cv::Rect(block_idx * nBins *  numCellsPerBlock * numCellsPerBlock + nBins * hist_i, keyPointIter, nBins, 1));
 							featureVector.copyTo(roi);
 						}
 					}
 				}
-			
-				
+
+
 			}
 
 			descriptors.copyTo(_descriptors);

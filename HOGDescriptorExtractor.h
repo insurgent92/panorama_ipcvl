@@ -20,6 +20,9 @@ namespace VISIONNOOB
 			~HOGDescriptorExtractor();
 
 			void compute(cv::InputArray image, std::vector<cv::KeyPoint>& keypoints, cv::OutputArray descriptors);
+		
+		private:
+			void refineKeypoints(std::vector<cv::KeyPoint>& keypoints, int cols, int rows);
 
 		private:
 			cv::Mat gradientDirection;
