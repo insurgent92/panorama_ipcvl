@@ -3,11 +3,11 @@
 #include <iostream>
 #include "use_opencv.h"
 
-namespace VISIONNOOB
+namespace visionNoob
 {
-	namespace PANORAMA
+	namespace computerVision
 	{
-		namespace UTIL
+		namespace util
 		{
 			std::vector<cv::Point> FindLocalMaximal(cv::Mat &src);
 			void pointWiseAffineTransform(const cv::Mat &src, cv::Mat& dst, const cv::Mat T);

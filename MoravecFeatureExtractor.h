@@ -2,15 +2,15 @@
 #include <iostream>
 #include "use_opencv.h"
 
-namespace VISIONNOOB
+namespace visionNoob
 {
-	namespace PANORAMA
+	namespace computerVision
 	{
-		class FeatureExtractor
+		class MoravecFeatureExtractor
 		{
 		public:
-			FeatureExtractor();
-			~FeatureExtractor();
+			MoravecFeatureExtractor();
+			~MoravecFeatureExtractor();
 			void detect(cv::InputArray _src, std::vector<cv::KeyPoint>& keypoints, int _windowSize, double threshold);
 		private:
 			void cornerMORAVEC(cv::InputArray _src, std::vector<cv::KeyPoint>& keypoints, int _windowSize, double threshold);

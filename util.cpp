@@ -8,11 +8,11 @@
 
 #include "use_opencv.h"
 
-namespace VISIONNOOB
+namespace visionNoob
 {
-	namespace PANORAMA
+	namespace computerVision
 	{
-		namespace UTIL
+		namespace util
 		{
 			std::vector<cv::Point> FindLocalMaximal(cv::Mat &src)
 			{

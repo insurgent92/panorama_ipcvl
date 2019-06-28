@@ -1,24 +1,24 @@
-#include "FeatureExtractor.h"
+#include "MoravecFeatureExtractor.h"
 
-namespace VISIONNOOB
+namespace visionNoob
 {
-	namespace PANORAMA
+	namespace computerVision
 	{
-		FeatureExtractor::FeatureExtractor()
+		MoravecFeatureExtractor::MoravecFeatureExtractor()
 		{
 		}
 
 
-		FeatureExtractor::~FeatureExtractor()
+		MoravecFeatureExtractor::~MoravecFeatureExtractor()
 		{
 		}
 
-		void FeatureExtractor::detect(cv::InputArray _src, std::vector<cv::KeyPoint>& keypoints, int _windowSize, double threshold)
+		void MoravecFeatureExtractor::detect(cv::InputArray _src, std::vector<cv::KeyPoint>& keypoints, int _windowSize, double threshold)
 		{
 			cornerMORAVEC(_src, keypoints, _windowSize, threshold);
 		}
 
-		void FeatureExtractor::constructKeypoints(cv::Mat keypointsMap, std::vector<cv::KeyPoint>& keypoints)
+		void MoravecFeatureExtractor::constructKeypoints(cv::Mat keypointsMap, std::vector<cv::KeyPoint>& keypoints)
 		{
 			for (int idy = 0; idy < keypointsMap.rows; idy++)
 			{
@@ -34,7 +34,7 @@ namespace VISIONNOOB
 			}
 		}
 
-		double FeatureExtractor::SSD(const cv::Mat& src1, const cv::Mat& src2)
+		double MoravecFeatureExtractor::SSD(const cv::Mat& src1, const cv::Mat& src2)
 		{
 			cv::Mat src_cvt1, src_cvt2;
 
@@ -45,7 +45,7 @@ namespace VISIONNOOB
 			return (double)cv::sum(difference.mul(difference))[0];
 		}
 
-		void FeatureExtractor::get_prob_features(cv::InputArray _src, int idy, int idx, std::vector<double>& prob_features, int _windowSize)
+		void MoravecFeatureExtractor::get_prob_features(cv::InputArray _src, int idy, int idx, std::vector<double>& prob_features, int _windowSize)
 		{
 			cv::Mat src = _src.getMat();
 			int roi_size = _windowSize / 2;
@@ -79,7 +79,7 @@ namespace VISIONNOOB
 		}
 
 
-		void FeatureExtractor::calcKeypointsMap(cv::InputArray _src, cv::OutputArray _dst, int _windowSize, double threshold)
+		void MoravecFeatureExtractor::calcKeypointsMap(cv::InputArray _src, cv::OutputArray _dst, int _windowSize, double threshold)
 		{
 			cv::Mat src = _src.getMat();
 			cv::Mat dst(src.size(), CV_64FC1, cv::Scalar(0.0));
@@ -108,7 +108,7 @@ namespace VISIONNOOB
 			dst.copyTo(_dst);
 		}
 
-		void FeatureExtractor::nonMaximumSuppression(cv::InputArray _src, cv::OutputArray _dst)
+		void MoravecFeatureExtractor::nonMaximumSuppression(cv::InputArray _src, cv::OutputArray _dst)
 		{
 			cv::Mat src = _src.getMat();
 			cv::Mat dst = src.clone();
@@ -142,7 +142,7 @@ namespace VISIONNOOB
 			dst.copyTo(_dst);
 		}
 
-		void FeatureExtractor::cornerMORAVEC(cv::InputArray _src, std::vector<cv::KeyPoint>& keypoints, int _windowSize, double threshold)
+		void MoravecFeatureExtractor::cornerMORAVEC(cv::InputArray _src, std::vector<cv::KeyPoint>& keypoints, int _windowSize, double threshold)
 		{
 			cv::Mat keypointsMap;
 			calcKeypointsMap(_src, keypointsMap, _windowSize, threshold);
