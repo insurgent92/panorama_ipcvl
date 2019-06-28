@@ -21,10 +21,10 @@ namespace visionNoob
 			public:
 				void getPanoramaImage(cv::OutputArray dst);
 				void getMatchingImage(cv::OutputArray dst);
+				void getPostProcessedPanoramaImage(cv::OutputArray dst);
 
 				void setImages(cv::InputArray _src1, cv::InputArray _src2);
 				void setImages(std::string src1_path, std::string src2_path);
-
 				void compute();
 
 			private:
@@ -34,6 +34,7 @@ namespace visionNoob
 				void refineMatches(bool printLog);
 				void findHomography(bool useOpenCVFunction, bool printLog);
 				void stitchImages();
+				void postProcess();
 				
 			private:
 				cv::Mat src1;
@@ -41,6 +42,8 @@ namespace visionNoob
 				cv::Mat src1_gray;
 				cv::Mat src2_gray;
 				cv::Mat panoramaResult;
+				cv::Mat panoramaBinaryMask;
+				cv::Mat postProcessedResult;
 
 				cv::Mat descriptor1, descriptor2;
 				cv::Mat homography;

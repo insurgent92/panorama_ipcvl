@@ -158,7 +158,6 @@
     <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="config.hpp" />
     <ClInclude Include="MoravecFeatureExtractor.h" />
     <ClInclude Include="HOGDescriptorExtractor.h" />
     <ClInclude Include="Matcher.h" />

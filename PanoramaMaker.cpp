@@ -121,7 +121,7 @@ namespace visionNoob
 					cv::BFMatcher matcher(cv::NORM_L2);
 					matcher.match(descriptor1, descriptor2, matches);
 				}
-				
+
 				else // else if(!useOpenCVFunction) 
 				{
 					visionNoob::computerVision::Matcher matcher;
@@ -134,7 +134,7 @@ namespace visionNoob
 				}
 
 				assert(matches.size() >= 4);
-				
+
 			}
 
 			void PanoramaMaker::findHomography(bool useOpenCVFunction, bool printLog)
@@ -155,14 +155,14 @@ namespace visionNoob
 				{
 					homography = visionNoob::computerVision::util::findHomographyWithRANSAC(left, right);
 				}
-				
+
 				assert(!homography.empty());
 
 				if (printLog)
 				{
 					std::cout << "homography" << homography << std::endl;
 				}
-				
+
 			}
 
 			void PanoramaMaker::refineMatches(bool printLog)
@@ -171,7 +171,7 @@ namespace visionNoob
 
 				auto it = matches.begin();
 
-				while (it != matches.end()) 
+				while (it != matches.end())
 				{
 					if ((*it).distance > distanceThreshold)
 					{
@@ -198,9 +198,10 @@ namespace visionNoob
 				assert(!src2.empty());
 				assert(!homography.empty());
 
-				visionNoob::computerVision::util::stitch(src1, src2, panoramaResult, homography);
+				visionNoob::computerVision::util::stitch(src1, src2, panoramaResult, panoramaBinaryMask, homography);
 
 				assert(!panoramaResult.empty());
+				assert(!panoramaBinaryMask.empty());
 			}
 
 			void PanoramaMaker::getMatchingImage(cv::OutputArray dst)
@@ -219,6 +220,94 @@ namespace visionNoob
 				matchingImage.copyTo(dst);
 			}
 
+			void PanoramaMaker::getPostProcessedPanoramaImage(cv::OutputArray dst)
+			{
+				assert(!postProcessedResult.empty());
+				postProcessedResult.copyTo(dst);
+			}
+
+			void PanoramaMaker::postProcess()
+			{
+				//initialization
+				int left_x = -1;
+				int right_x = panoramaBinaryMask.cols;
+
+				int top_y = -1;
+				int bottom_y = panoramaBinaryMask.rows;
+
+				//find top_y
+				for (int idx = 0; idx < panoramaBinaryMask.cols; idx++)
+				{
+					for (int idy = 0; idy < panoramaBinaryMask.rows; idy++)
+					{
+						if (panoramaBinaryMask.at<cv::Vec3b>(idy, idx)[0] == 1)
+						{
+							if (idy > top_y)
+							{
+								top_y = idy;
+							}
+							break;
+
+						}
+					}
+				}
+
+				//find bottom_y
+				for (int idx = 0; idx < panoramaBinaryMask.cols; idx++)
+				{
+					for (int idy = panoramaBinaryMask.rows - 1; idy >= 0; idy--)
+					{
+						if (panoramaBinaryMask.at<cv::Vec3b>(idy, idx)[0] == 1)
+						{
+							if (idy < bottom_y)
+							{
+								bottom_y = idy;
+							}
+							break;
+						}
+					}
+				}
+
+				//find left_x
+				for (int idy = top_y; idy <bottom_y; idy++)
+				{
+					for (int idx = 0; idx < panoramaBinaryMask.cols; idx++)
+					{
+						if (panoramaBinaryMask.at<cv::Vec3b>(idy, idx)[0] == 1)
+						{
+							if (idx > left_x)
+							{
+								left_x = idx;
+							}
+							break;
+						}
+					}
+				}
+
+				//find right_x
+				for (int idy = top_y; idy < bottom_y; idy++)
+				{
+					for (int idx = panoramaBinaryMask.cols - 1; idx >= 0; idx--)
+					{
+						if (panoramaBinaryMask.at<cv::Vec3b>(idy, idx)[0] == 1)
+						{
+							if (idx < right_x)
+							{
+								right_x = idx;
+							}
+							break;
+
+						}
+					}
+				}
+
+				
+
+				cv::Mat deb = panoramaBinaryMask.clone();
+				cv::Rect roi = cv::Rect(left_x, top_y, right_x - left_x, bottom_y - top_y);
+				postProcessedResult = panoramaResult(roi);
+			}
+
 			void PanoramaMaker::compute()
 			{
 				bool useOpenCVFunction = true;
@@ -226,10 +315,10 @@ namespace visionNoob
 
 				//Step 1: detect the keypoints
 				detectKeypoints(!useOpenCVFunction, printLog);
-		
+
 				//Step 2: calculate descriptors
 				calcDescriptors(!useOpenCVFunction, printLog);
-		
+
 				//Step 3: match descriptor vectors
 				matchDescriptors(!useOpenCVFunction, printLog);
 
@@ -241,6 +330,9 @@ namespace visionNoob
 
 				//Step 6 : stitch together based on Homograpy
 				stitchImages();
+
+				//Step 7 : postProcess
+				postProcess();
 			}
 		}
 	}
