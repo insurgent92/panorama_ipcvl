@@ -1,7 +1,8 @@
 #include "Matcher.h"
-namespace VISIONNOOB
+
+namespace visionNoob
 {
-	namespace PANORAMA
+	namespace computerVision
 	{
 		Matcher::Matcher()
 		{
@@ -62,9 +63,6 @@ namespace VISIONNOOB
 				matches.push_back(currentMatch);
 			}
 		}
-
-	
-
 	}
 }
 

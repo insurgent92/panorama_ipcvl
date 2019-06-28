@@ -1,8 +1,8 @@
 ﻿#include "HOGDescriptorExtractor.h"
 
-namespace VISIONNOOB
+namespace visionNoob
 {
-	namespace PANORAMA
+	namespace computerVision
 	{
 		HOGDescriptorExtractor::HOGDescriptorExtractor(
 			cv::Size _winSize,
@@ -19,7 +19,6 @@ namespace VISIONNOOB
 			nBins = _nBins;
 			L2HysThresh = _L2HysThresh;
 		}
-
 
 		HOGDescriptorExtractor::~HOGDescriptorExtractor()
 		{
@@ -51,8 +50,8 @@ namespace VISIONNOOB
 			cv::Mat inputImage = image.getMat();
 			std::tuple<cv::Mat, cv::Mat> derivatives;
 			std::tuple<cv::Mat, cv::Mat> degreeAndMagnitude;
-			VISIONNOOB::PANORAMA::UTIL::calcSobel(image, derivatives);
-			VISIONNOOB::PANORAMA::UTIL::calcGradientAndMagnitute(derivatives, degreeAndMagnitude);
+			visionNoob::computerVision::util::calcSobel(image, derivatives);
+			visionNoob::computerVision::util::calcGradientAndMagnitute(derivatives, degreeAndMagnitude);
 
 			cv::Mat degree = std::get<0>(degreeAndMagnitude);
 			cv::Mat manitude = std::get<1>(degreeAndMagnitude);

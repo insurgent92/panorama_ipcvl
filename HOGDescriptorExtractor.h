@@ -2,9 +2,9 @@
 #include "use_opencv.h"
 #include "util.hpp"
 
-namespace VISIONNOOB
+namespace visionNoob
 {
-	namespace PANORAMA
+	namespace computerVision
 	{
 		class HOGDescriptorExtractor
 		{

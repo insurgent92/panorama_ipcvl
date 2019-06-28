@@ -150,17 +150,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="FeatureExtractor.cpp" />
+    <ClCompile Include="MoravecFeatureExtractor.cpp" />
     <ClCompile Include="HOGDescriptorExtractor.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Matcher.cpp" />
+    <ClCompile Include="PanoramaMaker.cpp" />
     <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.hpp" />
-    <ClInclude Include="FeatureExtractor.h" />
+    <ClInclude Include="MoravecFeatureExtractor.h" />
     <ClInclude Include="HOGDescriptorExtractor.h" />
     <ClInclude Include="Matcher.h" />
+    <ClInclude Include="PanoramaMaker.h" />
     <ClInclude Include="util.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

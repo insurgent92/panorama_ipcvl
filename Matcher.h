@@ -2,9 +2,9 @@
 #include <iostream>
 #include "use_opencv.h"
 
-namespace VISIONNOOB
+namespace visionNoob
 {
-	namespace PANORAMA
+	namespace computerVision
 	{
 		class Matcher
 		{

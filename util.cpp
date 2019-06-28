@@ -3,16 +3,15 @@
 #include <cstdlib>
 #include <ctime>
 #include <cmath>
+#include "use_opencv.h"
 
 #define PI 3.1415926535
 
-#include "use_opencv.h"
-
-namespace VISIONNOOB
+namespace visionNoob
 {
-	namespace PANORAMA
+	namespace computerVision
 	{
-		namespace UTIL
+		namespace util
 		{
 			std::vector<cv::Point> FindLocalMaximal(cv::Mat &src)
 			{
