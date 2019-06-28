@@ -64,11 +64,20 @@ namespace visionNoob
 					}
 				}
 			}
-			void stitch(const cv::Mat& leftImage, const cv::Mat& rightImage, cv::OutputArray dst, const cv::Mat& rightT, int extraVerticalMargin, int extraHorizontalMargin)
+			void stitch(const cv::Mat& leftImage, const cv::Mat& rightImage, cv::OutputArray dst, cv::OutputArray binMask, const cv::Mat& rightT, int extraVerticalMargin, int extraHorizontalMargin)
 			{
 				dst.create(cv::Size(leftImage.cols * 2 + extraHorizontalMargin * 2, leftImage.rows + extraVerticalMargin * 2), CV_8UC3);
+				binMask.create(cv::Size(leftImage.cols * 2 + extraHorizontalMargin * 2, leftImage.rows + extraVerticalMargin * 2), CV_8UC3);
+
 				cv::Mat dstImage = dst.getMat();
+
+				cv::Mat binMaskImage = binMask.getMat();
+				cv::Mat binLeft = cv::Mat(leftImage.size(), CV_8UC3, cv::Scalar(1,1,1));
+				cv::Mat binRight = cv::Mat(rightImage.size(), CV_8UC3, cv::Scalar(1,1,1));
+
 				dstImage.setTo(cv::Scalar(0, 0, 0));
+				binMaskImage.setTo(cv::Scalar(0, 0, 0));
+
 				cv::Mat _rightT = rightT.clone();
 
 
@@ -80,6 +89,11 @@ namespace visionNoob
 
 				pointWiseAffineTransform(leftImage, dstImage, _leftT);
 				pointWiseAffineTransform(rightImage, dstImage, _rightT);
+
+				pointWiseAffineTransform(binLeft, binMaskImage, _leftT);
+				pointWiseAffineTransform(binRight, binMaskImage, _rightT);
+
+				cv::cvtColor(binMaskImage, binMaskImage, CV_RGB2GRAY);
 			}
 
 			cv::Mat estimateLeastSquare(std::vector<std::tuple<cv::Point2f, cv::Point2f>> keypointsPair)
