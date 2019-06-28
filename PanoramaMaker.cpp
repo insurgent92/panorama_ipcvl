@@ -301,9 +301,6 @@ namespace visionNoob
 					}
 				}
 
-				
-
-				cv::Mat deb = panoramaBinaryMask.clone();
 				cv::Rect roi = cv::Rect(left_x, top_y, right_x - left_x, bottom_y - top_y);
 				postProcessedResult = panoramaResult(roi);
 			}
