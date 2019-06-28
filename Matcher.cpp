@@ -63,9 +63,6 @@ namespace visionNoob
 				matches.push_back(currentMatch);
 			}
 		}
-
-	
-
 	}
 }
 

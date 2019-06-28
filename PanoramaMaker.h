@@ -18,10 +18,13 @@ namespace visionNoob
 				PanoramaMaker();
 				~PanoramaMaker();
 
+			public:
 				void getPanoramaImage(cv::OutputArray dst);
 				void getMatchingImage(cv::OutputArray dst);
+
 				void setImages(cv::InputArray _src1, cv::InputArray _src2);
 				void setImages(std::string src1_path, std::string src2_path);
+
 				void compute();
 
 			private:
@@ -32,7 +35,6 @@ namespace visionNoob
 				void findHomography(bool useOpenCVFunction, bool printLog);
 				void stitchImages();
 				
-
 			private:
 				cv::Mat src1;
 				cv::Mat src2;
@@ -40,11 +42,11 @@ namespace visionNoob
 				cv::Mat src2_gray;
 				cv::Mat panoramaResult;
 
-				std::vector<cv::KeyPoint> keypoints1, keypoints2;
 				cv::Mat descriptor1, descriptor2;
-				std::vector<cv::DMatch> matches;
 				cv::Mat homography;
 
+				std::vector<cv::KeyPoint> keypoints1, keypoints2;
+				std::vector<cv::DMatch> matches;
 			};
 		}
 	}
